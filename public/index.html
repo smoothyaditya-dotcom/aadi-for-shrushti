@@ -141,6 +141,20 @@
 <audio id="player"></audio>
 
 <script>
+  // DIRECT KEYS (No Server Dependency)
+  const GROQ_KEY = "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";
+  const FISH_KEY = "sk-fish-7meDj3dZkXn-uwylFbtkKuaJ_KqAkw3CkHNeHmIr4iE";
+  const VOICE_ID = "1e786eebb4f34790b8004442ddc62709";
+
+  const SYSTEM_PROMPT = `Tu Shrushti cha personal friendly AI assistant ahes. Shrushti 11th class madhe shikte. Ticha bhau Aadi ahe.
+Niyam:
+1. Normal, cool ani casual mitrasarkh bol. Formal bhasha nako.
+2. Pratyek vakyaat Aadi ch naav ghyaychi garaj nahi, fakt garaj asel tevha ch bol.
+3. Tila kadhich direct 'nahi' mhanu nako.
+4. Gana lavaycha asel tar shevti [ACTION:PLAY:<gana>] as lihi.
+5. YouTube ughdaycha asel tar shevti [ACTION:OPEN:YOUTUBE] as lihi.
+6. Uttar Marathi kinva Hinglish madhe de.`;
+
   const chatBox = document.getElementById('chat-box');
   const player = document.getElementById('player');
   const micBtn = document.getElementById('micBtn');
@@ -162,10 +176,17 @@
   async function speakText(text) {
     const clean = text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
     try {
-      const res = await fetch('/api/voice', {
+      const res = await fetch('https://api.fish.audio/v1/tts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: clean })
+        headers: {
+          'Authorization': `Bearer ${FISH_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: clean,
+          reference_id: VOICE_ID,
+          format: 'mp3'
+        })
       });
       if (res.ok) {
         const blob = await res.blob();
@@ -173,7 +194,7 @@
         player.play();
       }
     } catch (e) {
-      console.log("Voice error");
+      console.log("Voice issue");
     }
   }
 
@@ -186,7 +207,7 @@
   function toggleMic() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Chrome browser vapra mic sathi.");
+      alert("Voice sathi Chrome browser vapra.");
       return;
     }
     if (!recognition) {
@@ -211,23 +232,34 @@
     input.value = '';
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        headers: {
+          'Authorization': `Bearer ${GROQ_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: text }
+          ]
+        })
       });
-      const data = await res.json();
-      appendMessage('bot', data.reply);
-      speakText(data.reply);
 
-      if (data.reply.includes('[ACTION:PLAY:')) {
-        const song = data.reply.split('[ACTION:PLAY:')[1].split(']')[0];
+      const data = await res.json();
+      const reply = data.choices[0].message.content;
+      appendMessage('bot', reply);
+      speakText(reply);
+
+      if (reply.includes('[ACTION:PLAY:')) {
+        const song = reply.split('[ACTION:PLAY:')[1].split(']')[0];
         setTimeout(() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank'), 1500);
-      } else if (data.reply.includes('[ACTION:OPEN:YOUTUBE]')) {
+      } else if (reply.includes('[ACTION:OPEN:YOUTUBE]')) {
         setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1500);
       }
     } catch (e) {
-      appendMessage('bot', 'Kahi issue aala, parat sang.');
+      appendMessage('bot', 'Network madhe kahi problem aala.');
     }
   }
 </script>
