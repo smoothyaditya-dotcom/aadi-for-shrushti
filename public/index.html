@@ -141,16 +141,17 @@
 <audio id="player"></audio>
 
 <script>
+  const OPENROUTER_KEY = "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";
   const FISH_KEY = "sk-fish-7meDj3dZkXn-uwylFbtkKuaJ_KqAkw3CkHNeHmIr4iE";
   const VOICE_ID = "1e786eebb4f34790b8004442ddc62709";
 
   const SYSTEM_PROMPT = `Tu Shrushti cha personal friendly AI assistant ahes. Shrushti 11th class madhe shikte. Ticha bhau Aadi ahe.
 Niyam:
-1. Normal, friendly mitrasarkh bol.
-2. Tila kadhich direct nahi mhanu nako.
-3. Jevha ti gaana lavayla sangel tevha shevti [ACTION:PLAY:<gana>] as lihi.
-4. Jevha YouTube ughdayla sangel tevha shevti [ACTION:OPEN:YOUTUBE] as lihi.
-5. Uttar Marathi kinva Hinglish madhe de.`;
+1. Normal, cool ani natural mitrasarkh bol. Kitabi kinva formal nako.
+2. Tila kadhich direct 'nahi' bolu nako.
+3. Jevha ti gaana lavayla sangel tevha [ACTION:PLAY:<gana>] as shevti lihi.
+4. Jevha YouTube ughdayla sangel tevha [ACTION:OPEN:YOUTUBE] as lihi.
+5. Uttar Marathi kinva Hinglish madhe chota ani mast de.`;
 
   const chatBox = document.getElementById('chat-box');
   const player = document.getElementById('player');
@@ -190,9 +191,7 @@ Niyam:
         player.src = URL.createObjectURL(blob);
         player.play();
       }
-    } catch (e) {
-      console.log("Audio issue");
-    }
+    } catch (e) {}
   }
 
   function quickSend(t) {
@@ -229,17 +228,18 @@ Niyam:
     input.value = '';
 
     try {
-      const response = await fetch('https://text.pollinations.ai/openai', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: text }
-          ],
-          model: 'mistral'
+          ]
         })
       });
 
