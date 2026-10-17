@@ -4,59 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Shrushti's Assistant 🌷</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
   <style>
-    :root {
-      --primary: #ff4d6d;
-      --primary-gradient: linear-gradient(135deg, #ff758c 0%, #ff4d6d 100%);
-      --bg-gradient: linear-gradient(180deg, #fff0f3 0%, #ffe5ec 50%, #fcd5ce 100%);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg-gradient);
-      min-height: 100vh;
+      background: #fff0f3;
       display: flex;
       justify-content: center;
-      align-items: center;
+      height: 100vh;
       overflow: hidden;
-      color: #2b2b2b;
     }
-
     .app-card {
       width: 100%;
       max-width: 440px;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: #ffffff;
     }
-
     header {
       padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.9);
-      border-bottom: 1px solid rgba(255, 209, 220, 0.8);
+      background: #ff5d8f;
+      color: white;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
     }
-
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: var(--primary-gradient);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; color: white;
-    }
-    .brand-text h1 { font-size: 1rem; font-weight: 700; }
-    .brand-text p { font-size: 0.75rem; color: var(--primary); font-weight: 600; }
+    .avatar { font-size: 22px; }
+    .title h1 { font-size: 1rem; font-weight: 700; }
+    .title p { font-size: 0.72rem; opacity: 0.9; }
 
     #chat-box {
       flex: 1;
@@ -64,228 +41,196 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
-
     .msg-wrap { display: flex; flex-direction: column; max-width: 82%; }
-    .msg-wrap.user { align-self: flex-end; align-items: flex-end; }
-    .msg-wrap.bot { align-self: flex-start; align-items: flex-start; }
-
+    .msg-wrap.user { align-self: flex-end; }
+    .msg-wrap.bot { align-self: flex-start; }
     .msg-bubble {
-      padding: 12px 16px;
+      padding: 11px 15px;
       font-size: 0.92rem;
-      line-height: 1.45;
-      border-radius: 20px;
+      line-height: 1.4;
+      border-radius: 18px;
     }
-
     .msg-wrap.user .msg-bubble {
-      background: var(--primary-gradient);
-      color: #fff;
+      background: #ff5d8f;
+      color: white;
       border-bottom-right-radius: 4px;
     }
-
     .msg-wrap.bot .msg-bubble {
-      background: #fff;
+      background: #f8f9fa;
       color: #333;
       border-bottom-left-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid #ffe1e6;
+      border: 1px solid #eee;
     }
 
-    .msg-time { font-size: 0.65rem; color: #888; margin-top: 4px; }
-
     .shortcuts-bar {
-      padding: 8px 14px;
+      padding: 8px 12px;
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      white-space: nowrap;
-      background: rgba(255, 255, 255, 0.6);
+      background: #fff5f7;
     }
-    .shortcuts-bar::-webkit-scrollbar { display: none; }
-
     .chip {
-      background: #fff;
+      background: white;
       border: 1px solid #ffd1dc;
       padding: 6px 12px;
       border-radius: 16px;
       font-size: 0.78rem;
-      font-weight: 600;
-      color: #4a4a4a;
+      white-space: nowrap;
       cursor: pointer;
     }
 
     .input-bar {
       padding: 10px 14px;
-      background: #fff;
-      border-top: 1px solid #ffe1e6;
       display: flex;
-      align-items: center;
       gap: 8px;
+      border-top: 1px solid #ffe1e6;
+      background: white;
     }
-
     .input-field {
       flex: 1;
-      background: #fff0f3;
-      border: 1px solid #ffccd5;
-      padding: 10px 16px;
-      border-radius: 24px;
+      border: 1px solid #ffd1dc;
+      border-radius: 20px;
+      padding: 10px 14px;
       font-size: 0.92rem;
       outline: none;
     }
-
-    .btn-action {
-      width: 40px; height: 40px;
+    .btn {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
     }
-
-    .mic-btn { background: #ffe1e6; color: var(--primary); font-size: 18px; }
-    .mic-btn.listening { background: var(--primary); color: white; animation: pulse 1s infinite; }
-    .send-btn { background: var(--primary-gradient); color: #fff; font-size: 16px; }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
+    .mic-btn { background: #ffe1e6; font-size: 18px; }
+    .mic-btn.active { background: #ff5d8f; color: white; }
+    .send-btn { background: #ff5d8f; color: white; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <div class="app-card">
-    <header>
-      <div class="brand">
-        <div class="avatar">🌷</div>
-        <div class="brand-text">
-          <h1>Shrushti's Assistant</h1>
-          <p>🤍 Aadi is always with you</p>
-        </div>
-      </div>
-    </header>
-
-    <div id="chat-box"></div>
-
-    <div class="shortcuts-bar">
-      <div class="chip" onclick="quickSend('माझं आवडतं गाणं लाव')">🎵 गाणं लाव</div>
-      <div class="chip" onclick="quickSend('मला अभ्यासात मदत हवी आहे')">📚 अभ्यास</div>
-      <div class="chip" onclick="quickSend('मला थोडं उदास वाटतंय')">🥺 मूड ऑफ</div>
-      <div class="chip" onclick="quickSend('YouTube उघड')">▶️ YouTube</div>
+<div class="app-card">
+  <header>
+    <div class="avatar">🌷</div>
+    <div class="title">
+      <h1>Shrushti's Assistant</h1>
+      <p>Aadi's Gift</p>
     </div>
+  </header>
 
-    <div class="input-bar">
-      <button class="btn-action mic-btn" id="micBtn" onclick="toggleSpeech()">🎤</button>
-      <input type="text" id="userInput" class="input-field" placeholder="काहीही विचार किंवा सांग..." onkeydown="if(event.key==='Enter') sendMessage()" />
-      <button class="btn-action send-btn" onclick="sendMessage()">➤</button>
-    </div>
+  <div id="chat-box"></div>
+
+  <div class="shortcuts-bar">
+    <div class="chip" onclick="quickSend('माझं आवडतं गाणं लाव')">🎵 गाणं लाव</div>
+    <div class="chip" onclick="quickSend('मला अभ्यासात मदत हवी आहे')">📚 अभ्यास</div>
+    <div class="chip" onclick="quickSend('मला थोडं बोर होतंय')">☕ बोर होतंय</div>
+    <div class="chip" onclick="quickSend('YouTube उघड')">▶️ YouTube</div>
   </div>
 
-  <audio id="player"></audio>
+  <div class="input-bar">
+    <button class="btn mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+    <input type="text" id="userInput" class="input-field" placeholder="काहीही विचार..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button class="btn send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
 
-  <script>
-    const chatBox = document.getElementById('chat-box');
-    const player = document.getElementById('player');
-    const micBtn = document.getElementById('micBtn');
+<audio id="player"></audio>
 
-    window.onload = () => {
-      try { confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } }); } catch(e){}
-      const welcome = "Hey Shrushti! Happy Birthday! 🌷✨ आदीने खास तुझ्यासाठी हा तुझा पर्सनल AI असिस्टंट बनवून दिलाय. इथे तुला कोणी लेक्चर देणार नाही किंवा कशाला 'नाही' म्हणणार नाही. बाकी आदीचं तुझ्यावर खूप प्रेम आहे आणि तो नेहमी तुझ्याच सोबत आहे! बोल, आज काय करू?";
-      appendMessage('bot', welcome);
-    };
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const player = document.getElementById('player');
+  const micBtn = document.getElementById('micBtn');
 
-    function appendMessage(sender, text) {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const wrap = document.createElement('div');
-      wrap.className = `msg-wrap ${sender}`;
-      wrap.innerHTML = `
-        <div class="msg-bubble">${text.replace(/\[ACTION:[^\]]+\]/g, '')}</div>
-        <div class="msg-time">${timeStr}</div>
-      `;
-      chatBox.appendChild(wrap);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+  window.onload = () => {
+    const welcome = "Hey Shrushti! Happy Birthday! 🌷 Aadine khas tuzhyasathi ha assistant banvun dilay. Bol, aaj kay plan ahe?";
+    appendMessage('bot', welcome);
+    speakText(welcome);
+  };
 
-    async function speakText(text) {
-      const clean = text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
-      try {
-        const res = await fetch('/api/voice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: clean })
-        });
-        if (res.ok) {
-          const blob = await res.blob();
-          player.src = URL.createObjectURL(blob);
-          player.play();
-          return;
-        }
-      } catch (e) {}
+  function appendMessage(sender, text) {
+    const wrap = document.createElement('div');
+    wrap.className = `msg-wrap ${sender}`;
+    wrap.innerHTML = `<div class="msg-bubble">${text.replace(/\[ACTION:[^\]]+\]/g, '')}</div>`;
+    chatBox.appendChild(wrap);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-      // Fallback: Phone speech
-      if ('speechSynthesis' in window) {
-        const u = new SpeechSynthesisUtterance(clean);
-        u.lang = 'mr-IN';
-        window.speechSynthesis.speak(u);
+  async function speakText(text) {
+    const clean = text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
+    try {
+      const res = await fetch('/api/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: clean })
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        player.src = URL.createObjectURL(blob);
+        player.play();
       }
+    } catch (e) {
+      console.log("Voice error");
     }
+  }
 
-    function quickSend(t) {
-      document.getElementById('userInput').value = t;
-      sendMessage();
+  function quickSend(t) {
+    document.getElementById('userInput').value = t;
+    sendMessage();
+  }
+
+  let recognition;
+  function toggleMic() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Chrome browser vapra mic sathi.");
+      return;
     }
+    if (!recognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'mr-IN';
+      recognition.onstart = () => micBtn.classList.add('active');
+      recognition.onend = () => micBtn.classList.remove('active');
+      recognition.onresult = (e) => {
+        document.getElementById('userInput').value = e.results[0][0].transcript;
+        sendMessage();
+      };
+    }
+    recognition.start();
+  }
 
-    // Voice recognition (माईक)
-    let recognition;
-    function toggleSpeech() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert("तुमच्या ब्राऊझरमध्ये व्हॉईस सपोर्ट उपलब्ध नाही. कृपया Google Chrome वापरा.");
-        return;
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage('user', text);
+    input.value = '';
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      appendMessage('bot', data.reply);
+      speakText(data.reply);
+
+      if (data.reply.includes('[ACTION:PLAY:')) {
+        const song = data.reply.split('[ACTION:PLAY:')[1].split(']')[0];
+        setTimeout(() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank'), 1500);
+      } else if (data.reply.includes('[ACTION:OPEN:YOUTUBE]')) {
+        setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1500);
       }
-      if (!recognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'mr-IN';
-        recognition.onstart = () => micBtn.classList.add('listening');
-        recognition.onend = () => micBtn.classList.remove('listening');
-        recognition.onresult = (e) => {
-          document.getElementById('userInput').value = e.results[0][0].transcript;
-          sendMessage();
-        };
-      }
-      recognition.start();
+    } catch (e) {
+      appendMessage('bot', 'Kahi issue aala, parat sang.');
     }
+  }
+</script>
 
-    async function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      appendMessage('user', text);
-      input.value = '';
-
-      try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
-        });
-        const data = await res.json();
-        appendMessage('bot', data.reply);
-        speakText(data.reply);
-
-        if (data.reply.includes('[ACTION:PLAY:')) {
-          const song = data.reply.split('[ACTION:PLAY:')[1].split(']')[0];
-          setTimeout(() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank'), 1800);
-        } else if (data.reply.includes('[ACTION:OPEN:')) {
-          setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1800);
-        }
-      } catch (e) {
-        appendMessage('bot', 'सृष्टी, आदी नेहमी तुझ्या पाठीशी आहे, नेटवर्क आल्यावर पुन्हा ट्राय करू!');
-      }
-    }
-  </script>
 </body>
 </html>
