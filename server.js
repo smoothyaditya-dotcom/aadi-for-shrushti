@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -11,18 +10,16 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const FISH_AUDIO_API_KEY = process.env.FISH_AUDIO_API_KEY;
 const FISH_AUDIO_VOICE_ID = process.env.FISH_AUDIO_VOICE_ID;
 
-const SYSTEM_PROMPT = `Tu Shrushti cha personal AI assistant ahes.
-Ticha bhau 'Aadi' ahe. Shrushti 11th class madhe shikte.
+const SYSTEM_PROMPT = `तू सृष्टीचा पर्सनल AI असिस्टंट आहेस. तिचा भाऊ 'आदी' आहे. सृष्टी ११वीत शिकते.
+नियम:
+१. सृष्टीशी अतिशय आपुलकीने, गोड, आदरपूर्वक आणि काळजीवाहू मित्रासारखे बोलायचे.
+२. तिला कधीही थेट 'नाही' म्हणायचे नाही. तिचे म्हणणे आधी शांतपणे ऐकून घ्यायचे.
+३. प्रत्येक संभाषणात अत्यंत सहजपणे जाणीव करून द्यायची की तिचा भाऊ 'आदी' तिच्यावर खूप प्रेम करतो आणि तो नेहमी तिच्याच पाठीशी खंबीर उभा आहे.
+४. जर तिने गाणे लावायला सांगितले, तर उत्तराच्या शेवटी नक्की [ACTION:PLAY:<गाण्याचे नाव>] असे लिहायचे.
+५. जर तिने YouTube किंवा ॲप उघडायला सांगितले, तर [ACTION:OPEN:YOUTUBE] असे लिहायचे.
+६. उत्तर मराठी किंवा सोप्या हिंदीत द्यायचे.`;
 
-Niyam:
-1. Tichyashi premal, aadarane ani khup supportive bolaycha.
-2. Tila kadhich direct 'nahi' mhanaycha nahi. Ticha bolna aadhi shantapane aikaycha.
-3. Kahihi zala tari tila he veloveli janniv karun dyaychi ki ticha bhau 'Aadi' tichyavar khup prem karto ani to nehmi tichyach pathishi khambir ubha ahe.
-4. Jevha ti gaana lavayla sangel, tevha uttara-nantar [ACTION:PLAY:<gana>] as lihaycha.
-5. Jevha YouTube kiva app ughdayla sangel tevha [ACTION:OPEN:<app>] as lihaycha.
-6. Uttar Marathi kiva soppya Hindi madhe de.`;
-
-// Groq Chat API
+// Chat Route
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -42,18 +39,20 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Shrushti, Aadi nehmi tujhya sobt ahe!";
-    res.json({ reply });
+    if (data.choices && data.choices[0]) {
+      res.json({ reply: data.choices[0].message.content });
+    } else {
+      res.json({ reply: "सृष्टी, मी ऐकतोय तुला! सांग काय करू? आणि आदी नेहमी तुझ्याच सोबत आहे, काळजी नको करू!" });
+    }
   } catch (error) {
-    res.status(500).json({ error: "Chat madhe issue aala." });
+    res.json({ reply: "सृष्टी, मी इथेच आहे तुझ्यासोबत! आदी नेहमी तुझ्या पाठीशी आहे." });
   }
 });
 
-// Fish Audio TTS API
+// Voice Route
 app.post('/api/voice', async (req, res) => {
   try {
     const textToSpeak = req.body.text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
-
     const response = await fetch('https://api.fish.audio/v1/tts', {
       method: 'POST',
       headers: {
@@ -67,11 +66,15 @@ app.post('/api/voice', async (req, res) => {
       })
     });
 
+    if (!response.ok) {
+      return res.status(500).send("Fish Audio error");
+    }
+
     const audioBuffer = await response.arrayBuffer();
     res.set('Content-Type', 'audio/mpeg');
     res.send(Buffer.from(audioBuffer));
   } catch (error) {
-    res.status(500).send("Voice error");
+    res.status(500).send("Voice generation failed");
   }
 });
 
