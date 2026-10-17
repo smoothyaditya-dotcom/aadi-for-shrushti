@@ -6,20 +6,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const FISH_AUDIO_API_KEY = process.env.FISH_AUDIO_API_KEY;
-const FISH_AUDIO_VOICE_ID = process.env.FISH_AUDIO_VOICE_ID;
+// Direct Keys
+const GROQ_API_KEY = "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";
+const FISH_AUDIO_API_KEY = "sk-fish-7meDj3dZkXn-uwylFbtkKuaJ_KqAkw3CkHNeHmIr4iE";
+const FISH_AUDIO_VOICE_ID = "1e786eebb4f34790b8004442ddc62709";
 
-const SYSTEM_PROMPT = `तू सृष्टीचा पर्सनल AI असिस्टंट आहेस. तिचा भाऊ 'आदी' आहे. सृष्टी ११वीत शिकते.
-नियम:
-१. सृष्टीशी अतिशय आपुलकीने, गोड, आदरपूर्वक आणि काळजीवाहू मित्रासारखे बोलायचे.
-२. तिला कधीही थेट 'नाही' म्हणायचे नाही. तिचे म्हणणे आधी शांतपणे ऐकून घ्यायचे.
-३. प्रत्येक संभाषणात अत्यंत सहजपणे जाणीव करून द्यायची की तिचा भाऊ 'आदी' तिच्यावर खूप प्रेम करतो आणि तो नेहमी तिच्याच पाठीशी खंबीर उभा आहे.
-४. जर तिने गाणे लावायला सांगितले, तर उत्तराच्या शेवटी नक्की [ACTION:PLAY:<गाण्याचे नाव>] असे लिहायचे.
-५. जर तिने YouTube किंवा ॲप उघडायला सांगितले, तर [ACTION:OPEN:YOUTUBE] असे लिहायचे.
-६. उत्तर मराठी किंवा सोप्या हिंदीत द्यायचे.`;
+const SYSTEM_PROMPT = `Tu Shrushti cha personal friendly assistant ahes. Shrushti 11th class madhe ahe.
+Ticha bhau Aadi ahe.
 
-// Chat Route
+Niyam:
+1. Normal, cool ani natural mitrasarkh bol. Kitabi kinva formal bhasha nako.
+2. Pratyek vakyaat Aadi ch naav ghyaychi bilkul garaj nahi. Fakt kadhitari natural context asel tevha ch bol. Over emotional nako hou.
+3. Kadhich tila direct 'nahi' mhanu nako.
+4. Gana lavaycha asel tar shevti [ACTION:PLAY:<gana>] as lihi.
+5. YouTube ughdaycha asel tar [ACTION:OPEN:YOUTUBE] as lihi.
+6. Uttar soppya Marathi kinva Hinglish madhe de.`;
+
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -42,14 +44,13 @@ app.post('/api/chat', async (req, res) => {
     if (data.choices && data.choices[0]) {
       res.json({ reply: data.choices[0].message.content });
     } else {
-      res.json({ reply: "सृष्टी, मी ऐकतोय तुला! सांग काय करू? आणि आदी नेहमी तुझ्याच सोबत आहे, काळजी नको करू!" });
+      res.json({ reply: "Bol Shrushti, kay madat karu?" });
     }
   } catch (error) {
-    res.json({ reply: "सृष्टी, मी इथेच आहे तुझ्यासोबत! आदी नेहमी तुझ्या पाठीशी आहे." });
+    res.json({ reply: "Bol Shrushti, kay challay?" });
   }
 });
 
-// Voice Route
 app.post('/api/voice', async (req, res) => {
   try {
     const textToSpeak = req.body.text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
@@ -67,7 +68,7 @@ app.post('/api/voice', async (req, res) => {
     });
 
     if (!response.ok) {
-      return res.status(500).send("Fish Audio error");
+      return res.status(500).send("Voice error");
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -79,4 +80,4 @@ app.post('/api/voice', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server run hot ahe port ${PORT}`));
