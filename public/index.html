@@ -204,7 +204,7 @@ Niyam:
   function toggleMic() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Chrome browser vapra.");
+      alert("Chrome browser vapra mic sathi.");
       return;
     }
     if (!recognition) {
@@ -229,9 +229,22 @@ Niyam:
     input.value = '';
 
     try {
-      const prompt = encodeURIComponent(`${SYSTEM_PROMPT}\nUser: ${text}\nAssistant:`);
-      const response = await fetch(`https://text.pollinations.ai/${prompt}`);
-      const reply = await response.text();
+      const response = await fetch('https://text.pollinations.ai/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: text }
+          ],
+          model: 'mistral'
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.choices[0].message.content;
 
       appendMessage('bot', reply);
       speakText(reply);
