@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shrushti's Assistant 🌷</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Yatra+One&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #ff4d6d;
+      --primary-gradient: linear-gradient(135deg, #ff758c 0%, #ff4d6d 100%);
+      --bg-gradient: linear-gradient(180deg, #fff0f3 0%, #ffe5ec 50%, #fcd5ce 100%);
+      --glass-bg: rgba(255, 255, 255, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --text-main: #2b2b2b;
+      --text-muted: #6c757d;
+      --shadow-sm: 0 4px 15px rgba(255, 77, 109, 0.08);
+      --shadow-md: 0 8px 30px rgba(255, 77, 109, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: var(--text-main);
+    }
+
+    /* Floating Petals Effect */
+    .petals-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      background: radial-gradient(circle, #ffccd5 0%, #ffb3c1 100%);
+      border-radius: 150% 0 150% 0;
+      opacity: 0.35;
+      animation: floatPetal 14s infinite linear;
+    }
+
+    @keyframes floatPetal {
+      0% { transform: translateY(-10%) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.4; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* App Shell */
+    .app-card {
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+      z-index: 1;
+      border: 1px solid var(--glass-border);
+    }
+
+    @media (min-width: 480px) {
+      .app-card {
+        height: 94vh;
+        border-radius: 36px;
+        box-shadow: var(--shadow-md);
+      }
+    }
+
+    /* Header */
+    header {
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.85);
+      border-bottom: 1px solid rgba(255, 209, 220, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.3);
+      border: 2px solid #fff;
+    }
+
+    .online-indicator {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 11px;
+      height: 11px;
+      background: #2ec4b6;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #2b2b2b;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Waveform Animation */
+    .waveform {
+      display: none;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+      padding: 4px 10px;
+      background: #fff0f3;
+      border-radius: 20px;
+      border: 1px solid #ffd1dc;
+    }
+
+    .waveform.active {
+      display: flex;
+    }
+
+    .waveform .bar {
+      width: 3px;
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      animation: pulse 1s infinite ease-in-out;
+    }
+
+    .waveform .bar:nth-child(2) { animation-delay: 0.2s; }
+    .waveform .bar:nth-child(3) { animation-delay: 0.4s; }
+    .waveform .bar:nth-child(4) { animation-delay: 0.1s; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* Chat Area */
+    #chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    #chat-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    .msg-wrap {
+      display: flex;
+      flex-direction: column;
+      max-width: 84%;
+    }
+
+    .msg-wrap.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .msg-wrap.bot {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .msg-bubble {
+      padding: 13px 18px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+      position: relative;
+      word-break: break-word;
+    }
+
+    .msg-wrap.user .msg-bubble {
+      background: var(--primary-gradient);
+      color: #fff;
+      border-radius: 22px 22px 4px 22px;
+      box-shadow: 0 4px 15px rgba(255, 77, 109, 0.25);
+    }
+
+    .msg-wrap.bot .msg-bubble {
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      border-radius: 22px 22px 22px 4px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255, 225, 230, 0.8);
+    }
+
+    .msg-time {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      padding: 0 4px;
+    }
+
+    /* Quick Shortcuts */
+    .shortcuts-bar {
+      padding: 8px 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .shortcuts-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      background: #fff;
+      border: 1px solid #ffd1dc;
+      padding: 7px 14px;
+      border-radius: 18px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4a4a4a;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
+    }
+
+    .chip:active {
+      transform: scale(0.95);
+      background: #fff0f3;
+    }
+
+    /* Input Bar */
+    .input-bar {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.9);
+      border-top: 1px solid rgba(255, 209, 220, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-field {
+      flex: 1;
+      background: #fff0f3;
+      border: 1.5px solid #ffccd5;
+      padding: 12px 18px;
+      border-radius: 28px;
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+      color: #333;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.3);
+      transition: transform 0.15s ease;
+    }
+
+    .send-btn:active {
+      transform: scale(0.92);
+    }
+
+    .send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      margin-left: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Falling Petals Background -->
+  <div class="petals-container" id="petals"></div>
+
+  <div class="app-card">
+    <header>
+      <div class="brand">
+        <div class="avatar-wrapper">
+          <div class="avatar">🌷</div>
+          <div class="online-indicator"></div>
+        </div>
+        <div class="brand-text">
+          <h1>Shrushti's Assistant</h1>
+          <p><span>🤍</span> Aadi is always with you</p>
+        </div>
+      </div>
+
+      <div class="waveform" id="waveform">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </header>
+
+    <div id="chat-box"></div>
+
+    <!-- Quick Shortcuts Chips -->
+    <div class="shortcuts-bar">
+      <div class="chip" onclick="quickSend('माझं आवडतं गाणं लाव')">🎵 गाणं लाव</div>
+      <div class="chip" onclick="quickSend('मला अभ्यासात मदत हवी आहे')">📚 अभ्यास</div>
+      <div class="chip" onclick="quickSend('मला थोडं उदास वाटतंय')">🥺 मूड ऑफ</div>
+      <div class="chip" onclick="quickSend('YouTube उघड')">▶️ YouTube</div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-bar">
+      <input type="text" id="userInput" class="input-field" placeholder="सांग सृष्टी, काय मदत करू..." onkeydown="handleKey(event)" />
+      <button class="send-btn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <audio id="player"></audio>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const player = document.getElementById('player');
+    const waveform = document.getElementById('waveform');
+
+    // Generate Petals
+    function createPetals() {
+      const container = document.getElementById('petals');
+      for (let i = 0; i < 15; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.width = (Math.random() * 12 + 10) + 'px';
+        petal.style.height = (Math.random() * 16 + 14) + 'px';
+        petal.style.animationDuration = (Math.random() * 8 + 8) + 's';
+        petal.style.animationDelay = (Math.random() * 5) + 's';
+        container.appendChild(petal);
+      }
+    }
+    createPetals();
+
+    // Trigger Birthday Confetti
+    function launchConfetti() {
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ff758c', '#ffb3c1', '#ffd166', '#06d6a0']
+      });
+    }
+
+    // First Welcome Message
+    window.onload = () => {
+      launchConfetti();
+      const welcome = "Hey Shrushti! Happy Birthday! 🌷✨ आदीने खास तुझ्यासाठी हा तुझा पर्सनल AI असिस्टंट बनवून दिलाय. इथे तुला कोणी लेक्चर देणार नाही किंवा कशाला 'नाही' म्हणणार नाही. तुला काहीही मदत हवी असेल—अभ्यास, गाणी, किंवा नुसतं कोणावर चिडायचं असेल—मी हजर आहे. बाकी आदीचं तुझ्यावर खूप प्रेम आहे आणि तो नेहमी तुझ्याच सोबत आहे, हे माहितीयेच तुला! बोल, आज काय करू?";
+      appendMessage('bot', welcome);
+      speakText(welcome);
+    };
+
+    function appendMessage(sender, text) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const wrap = document.createElement('div');
+      wrap.className = `msg-wrap ${sender}`;
+      wrap.innerHTML = `
+        <div class="msg-bubble">${text.replace(/\[ACTION:[^\]]+\]/g, '')}</div>
+        <div class="msg-time">${timeStr}</div>
+      `;
+      chatBox.appendChild(wrap);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function speakText(text) {
+      try {
+        waveform.classList.add('active');
+        const res = await fetch('/api/voice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const blob = await res.blob();
+        player.src = URL.createObjectURL(blob);
+        player.play();
+        player.onended = () => waveform.classList.remove('active');
+      } catch (e) {
+        waveform.classList.remove('active');
+      }
+    }
+
+    function quickSend(text) {
+      document.getElementById('userInput').value = text;
+      sendMessage();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage('user', text);
+      input.value = '';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        appendMessage('bot', data.reply);
+        speakText(data.reply);
+
+        // Actions Handler (YouTube / Song)
+        if (data.reply.includes('[ACTION:PLAY:')) {
+          const song = data.reply.split('[ACTION:PLAY:')[1].split(']')[0];
+          setTimeout(() => {
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank');
+          }, 2000);
+        } else if (data.reply.includes('[ACTION:OPEN:')) {
+          setTimeout(() => {
+            window.open('https://www.youtube.com', '_blank');
+          }, 2000);
+        }
+      } catch (e) {
+        appendMessage('bot', 'सृष्टी, काहीतरी नेटवर्क प्रॉब्लेम आला, पण काळजी करू नकोस आदी नेहमी तुझ्याच सोबत आहे!');
+      }
+    }
+  </script>
+</body>
+</html>
